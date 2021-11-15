@@ -1,0 +1,90 @@
+## Importing Necessary Modules.
+import os.path  # to check if xlsx exists
+import pandas as pd  # to read xlsx
+import requests  # to get image from the web
+import shutil  # to save it locally
+
+# Progress function
+def progress(pobrane_pliki, liczba_plików_total):
+    p_bar = pobrane_pliki * 100 / liczba_plików_total
+    return p_bar
+
+# Check for correct format of links function
+def links_check(lista_linków):
+    correct_links = True
+    print('Sprawdzam czy każdy link zaczyna się od "https://" i kończy na ".jpg".\n')
+    for image_url in all_images_url:
+        if image_url.startswith('https://') and image_url.endswith('.jpg'):
+            continue
+        else:
+            print('Nieprawidłowy link:\n' + image_url)
+            correct_links = False
+    if correct_links == True:
+        print('Wszystkie linki w prawidłowym formacie, przechodzę do pobierania.\n')
+    else:
+        print('\nPopraw w arkuszu i odpal ponownie pobierak.exe.\n')
+        input('Wciśnij - Enter - aby zamknąć program...\n')
+        exit()
+
+
+print('WELCOME to POBIERAK by:')
+print(r"""           _     _                                 
+          (_)   | |                                
+ ___ _ __  _  __| | ___ _ __ 
+/ __| '_ \| |/ _` |/ _ \ '__|
+\__ \ |_) | | (_| |  __/ |  
+|___/ .__/|_|\__,_|\___|_|  
+    | |                                            
+    |_|"""'\n')
+
+## Uncomment this and comment two lines below to change the way of passing data from reading excel to user input
+# # User passes image urls.
+# links = input("\nWklej poniżej linki do zdjęć (zakończone rozszerzeniem .jpg lub png) oddzielając je przecinkami:\n")
+# # Create list of separate image urls.
+# all_images_url = links.split(",")  # The splitting symbol can be changed
+# # print(all_images_url) # To check if the list is correct
+
+if os.path.isfile('pobierak.xlsx'):
+    links = pd.read_excel('pobierak.xlsx', 'Arkusz1')  # This is how xlsx and sheet should be named
+    all_images_url = links['photo_url'].values.tolist()  # Create a list of values only! from photo_url column
+    # count = 0  # The list created above can be printed if needed
+    # while count < len(all_images_url):
+    # print(all_images_url[count])
+    # count += 1
+else:
+    print('                                    ___INSTRUKCJA___\n'
+          'Aby pobrać zdjęcia z Displaya należy stworzyć plik excel o nazwie - pobierak.xlsx.\n'
+          'W tym pliku w Arkuszu1 utworzyć kolumnę o nazwie photo_url i wkleić tam linki do zdjęć (1 wiersz = 1 link).\n\n'
+          'Plik programu - pobierak.exe oraz arkusz pobierak.xlsx umieść w katalogu do którego mają pobrać się zdjęcia.\n'
+          )
+    input("Kiedy będziesz gotowy/a odpal ponownie pobierak.exe\n\nWciśnij - Enter - aby zamknąć program...\n")
+    exit()
+
+# Call links_check function
+links_check(all_images_url)
+# Data for progress function
+lp = len(all_images_url)  # liczba plików
+pp = 0  # pobrane pliki
+
+# Loop through the list of image urls.
+for image_url in all_images_url:
+    print(progress(pp, lp), '%')
+    filename = image_url.split("/")[-1]
+    # Open the url image, set stream to True, this will return the stream content.
+    r = requests.get(image_url, stream=True)
+    # Check if the image was retrieved successfully.
+    if r.status_code == 200:
+        # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
+        r.raw.decode_content = True
+        # Open a local file with wb ( write binary ) permission.
+        with open(filename, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+            pp += 1
+            progress(pp, lp)  # Call progress function
+        # Print the information about result.
+        print('Pobrane:', filename)
+        if progress(pp, lp) == 100:  # Check if download is completed
+            print('\n100% Finished!\n')
+            input('Wciśnij - Enter - aby zamknąć program...\n')
+    else:
+        print('Nie udało się pobrać tego zdjęcia:', filename)
