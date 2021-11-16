@@ -1,0 +1,6 @@
+# Change the way of passing data from reading excel to user input
+# # User passes image urls.
+# links = input("\nWklej poniżej linki do zdjęć (zakończone rozszerzeniem .jpg lub png) oddzielając je przecinkami:\n")
+# # Create list of separate image urls.
+# all_images_url = links.split(",")  # The splitting symbol can be changed
+# # print(all_images_url) # To check if the list is correct
