@@ -37,13 +37,6 @@ print(r"""           _     _
     | |                                            
     |_|"""'\n')
 
-## Uncomment this and comment two lines below to change the way of passing data from reading excel to user input
-# # User passes image urls.
-# links = input("\nWklej poniżej linki do zdjęć (zakończone rozszerzeniem .jpg lub png) oddzielając je przecinkami:\n")
-# # Create list of separate image urls.
-# all_images_url = links.split(",")  # The splitting symbol can be changed
-# # print(all_images_url) # To check if the list is correct
-
 if os.path.isfile('pobierak.xlsx'):
     links = pd.read_excel('pobierak.xlsx', 'Arkusz1')  # This is how xlsx and sheet should be named
     all_images_url = links['photo_url'].values.tolist()  # Create a list of values only! from photo_url column
